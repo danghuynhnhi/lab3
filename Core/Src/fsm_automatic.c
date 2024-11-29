@@ -40,8 +40,8 @@ void fsm_automatic_run() {
 
             if (redFlag() == 1) {
                 // Chuyển sang trạng thái North-South
-                number1 = durForGreen;
-                number2 = durForRed;
+                number1 = durForGreen-1;
+                number2 = durForRed-1;
 
                 HAL_GPIO_WritePin(GPIOA, D1_Pin | D2_Pin, SET);  // Tắt đèn đỏ
                 HAL_GPIO_WritePin(GPIOA, D3_Pin, RESET);         // Bật đèn xanh
@@ -97,8 +97,6 @@ void fsm_automatic_run() {
 
 
         default:
-            // Quay lại trạng thái INIT nếu gặp lỗi
-            state = INIT;
             break;
     }
 }

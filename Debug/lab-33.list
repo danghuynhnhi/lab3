@@ -37,13 +37,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  00016f7b  00000000  00000000  0002c548  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000c1de  00000000  00000000  000434c3  2**0
+ 17 .debug_line   0000c1ea  00000000  00000000  000434c3  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0008250e  00000000  00000000  0004f6a1  2**0
+ 18 .debug_str    0008250e  00000000  00000000  0004f6ad  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000053  00000000  00000000  000d1baf  2**0
+ 19 .comment      00000053  00000000  00000000  000d1bbb  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000284c  00000000  00000000  000d1c04  2**2
+ 20 .debug_frame  0000284c  00000000  00000000  000d1c10  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -334,16 +334,20 @@ void fsm_automatic_run() {
  8000320:	4b83      	ldr	r3, [pc, #524]	; (8000530 <fsm_automatic_run+0x214>)
  8000322:	681b      	ldr	r3, [r3, #0]
  8000324:	2b02      	cmp	r3, #2
- 8000326:	f000 8094 	beq.w	8000452 <fsm_automatic_run+0x136>
+ 8000326:	f000 8096 	beq.w	8000456 <fsm_automatic_run+0x13a>
  800032a:	2b02      	cmp	r3, #2
- 800032c:	f300 80f7 	bgt.w	800051e <fsm_automatic_run+0x202>
+ 800032c:	f300 80f9 	bgt.w	8000522 <fsm_automatic_run+0x206>
  8000330:	2b00      	cmp	r3, #0
  8000332:	d002      	beq.n	800033a <fsm_automatic_run+0x1e>
  8000334:	2b01      	cmp	r3, #1
  8000336:	d028      	beq.n	800038a <fsm_automatic_run+0x6e>
- 8000338:	e0f1      	b.n	800051e <fsm_automatic_run+0x202>
-        case INIT:
-            // Khởi tạo giá trị ban đầu
+            }
+            break;
+
+
+        default:
+            break;
+ 8000338:	e0f3      	b.n	8000522 <fsm_automatic_run+0x206>
             number1 = durForRed - 1;
  800033a:	4b7e      	ldr	r3, [pc, #504]	; (8000534 <fsm_automatic_run+0x218>)
  800033c:	681b      	ldr	r3, [r3, #0]
@@ -356,8 +360,6 @@ void fsm_automatic_run() {
  8000348:	3b01      	subs	r3, #1
  800034a:	4a7d      	ldr	r2, [pc, #500]	; (8000540 <fsm_automatic_run+0x224>)
  800034c:	6013      	str	r3, [r2, #0]
-
-            // Cấu hình đèn: Đèn đỏ và xanh sáng
             HAL_GPIO_WritePin(GPIOA, D1_Pin, RESET);  // Đỏ
  800034e:	2200      	movs	r2, #0
  8000350:	2102      	movs	r1, #2
@@ -378,30 +380,23 @@ void fsm_automatic_run() {
  800036e:	2140      	movs	r1, #64	; 0x40
  8000370:	4874      	ldr	r0, [pc, #464]	; (8000544 <fsm_automatic_run+0x228>)
  8000372:	f001 f910 	bl	8001596 <HAL_GPIO_WritePin>
-
-            // Khởi động các bộ đếm
             setTimerRed();
  8000376:	f000 fcc7 	bl	8000d08 <setTimerRed>
             setTimerGreen();
  800037a:	f000 fcd7 	bl	8000d2c <setTimerGreen>
             setOneSecond();
  800037e:	f000 fcf3 	bl	8000d68 <setOneSecond>
-
-            // Chuyển sang trạng thái East-West
             state = EastWest;
  8000382:	4b6b      	ldr	r3, [pc, #428]	; (8000530 <fsm_automatic_run+0x214>)
  8000384:	2201      	movs	r2, #1
  8000386:	601a      	str	r2, [r3, #0]
             break;
  8000388:	e0d0      	b.n	800052c <fsm_automatic_run+0x210>
-
-        case EastWest:
             if (oneSecondFlag() == 1) {
  800038a:	f000 fcab 	bl	8000ce4 <oneSecondFlag>
  800038e:	4603      	mov	r3, r0
  8000390:	2b01      	cmp	r3, #1
  8000392:	d113      	bne.n	80003bc <fsm_automatic_run+0xa0>
-                // Giảm số đếm
                 if (number1 > 0) number1--;
  8000394:	4b68      	ldr	r3, [pc, #416]	; (8000538 <fsm_automatic_run+0x21c>)
  8000396:	681b      	ldr	r3, [r3, #0]
@@ -424,14 +419,11 @@ void fsm_automatic_run() {
  80003b6:	6013      	str	r3, [r2, #0]
                 setOneSecond();
  80003b8:	f000 fcd6 	bl	8000d68 <setOneSecond>
-            }
-
             if (greenFlag() == 1) {
  80003bc:	f000 fc6e 	bl	8000c9c <greenFlag>
  80003c0:	4603      	mov	r3, r0
  80003c2:	2b01      	cmp	r3, #1
  80003c4:	d111      	bne.n	80003ea <fsm_automatic_run+0xce>
-                // Chuyển sang đèn xanh
                 HAL_GPIO_WritePin(GPIOA, D4_Pin | D6_Pin, SET);  // Tắt đèn xanh cũ
  80003c6:	2201      	movs	r2, #1
  80003c8:	2150      	movs	r1, #80	; 0x50
@@ -451,204 +443,177 @@ void fsm_automatic_run() {
  80003e4:	3b01      	subs	r3, #1
  80003e6:	4a56      	ldr	r2, [pc, #344]	; (8000540 <fsm_automatic_run+0x224>)
  80003e8:	6013      	str	r3, [r2, #0]
-            }
-
             if (redFlag() == 1) {
  80003ea:	f000 fc45 	bl	8000c78 <redFlag>
  80003ee:	4603      	mov	r3, r0
  80003f0:	2b01      	cmp	r3, #1
- 80003f2:	d124      	bne.n	800043e <fsm_automatic_run+0x122>
-                // Chuyển sang trạng thái North-South
-                number1 = durForGreen;
+ 80003f2:	d126      	bne.n	8000442 <fsm_automatic_run+0x126>
+                number1 = durForGreen-1;
  80003f4:	4b51      	ldr	r3, [pc, #324]	; (800053c <fsm_automatic_run+0x220>)
  80003f6:	681b      	ldr	r3, [r3, #0]
- 80003f8:	4a4f      	ldr	r2, [pc, #316]	; (8000538 <fsm_automatic_run+0x21c>)
- 80003fa:	6013      	str	r3, [r2, #0]
-                number2 = durForRed;
- 80003fc:	4b4d      	ldr	r3, [pc, #308]	; (8000534 <fsm_automatic_run+0x218>)
- 80003fe:	681b      	ldr	r3, [r3, #0]
- 8000400:	4a4f      	ldr	r2, [pc, #316]	; (8000540 <fsm_automatic_run+0x224>)
- 8000402:	6013      	str	r3, [r2, #0]
-
+ 80003f8:	3b01      	subs	r3, #1
+ 80003fa:	4a4f      	ldr	r2, [pc, #316]	; (8000538 <fsm_automatic_run+0x21c>)
+ 80003fc:	6013      	str	r3, [r2, #0]
+                number2 = durForRed-1;
+ 80003fe:	4b4d      	ldr	r3, [pc, #308]	; (8000534 <fsm_automatic_run+0x218>)
+ 8000400:	681b      	ldr	r3, [r3, #0]
+ 8000402:	3b01      	subs	r3, #1
+ 8000404:	4a4e      	ldr	r2, [pc, #312]	; (8000540 <fsm_automatic_run+0x224>)
+ 8000406:	6013      	str	r3, [r2, #0]
                 HAL_GPIO_WritePin(GPIOA, D1_Pin | D2_Pin, SET);  // Tắt đèn đỏ
- 8000404:	2201      	movs	r2, #1
- 8000406:	2106      	movs	r1, #6
- 8000408:	484e      	ldr	r0, [pc, #312]	; (8000544 <fsm_automatic_run+0x228>)
- 800040a:	f001 f8c4 	bl	8001596 <HAL_GPIO_WritePin>
+ 8000408:	2201      	movs	r2, #1
+ 800040a:	2106      	movs	r1, #6
+ 800040c:	484d      	ldr	r0, [pc, #308]	; (8000544 <fsm_automatic_run+0x228>)
+ 800040e:	f001 f8c2 	bl	8001596 <HAL_GPIO_WritePin>
                 HAL_GPIO_WritePin(GPIOA, D3_Pin, RESET);         // Bật đèn xanh
- 800040e:	2200      	movs	r2, #0
- 8000410:	2108      	movs	r1, #8
- 8000412:	484c      	ldr	r0, [pc, #304]	; (8000544 <fsm_automatic_run+0x228>)
- 8000414:	f001 f8bf 	bl	8001596 <HAL_GPIO_WritePin>
+ 8000412:	2200      	movs	r2, #0
+ 8000414:	2108      	movs	r1, #8
+ 8000416:	484b      	ldr	r0, [pc, #300]	; (8000544 <fsm_automatic_run+0x228>)
+ 8000418:	f001 f8bd 	bl	8001596 <HAL_GPIO_WritePin>
                 HAL_GPIO_WritePin(GPIOA, D5_Pin | D6_Pin, SET);  // Tắt đèn vàng
- 8000418:	2201      	movs	r2, #1
- 800041a:	2160      	movs	r1, #96	; 0x60
- 800041c:	4849      	ldr	r0, [pc, #292]	; (8000544 <fsm_automatic_run+0x228>)
- 800041e:	f001 f8ba 	bl	8001596 <HAL_GPIO_WritePin>
+ 800041c:	2201      	movs	r2, #1
+ 800041e:	2160      	movs	r1, #96	; 0x60
+ 8000420:	4848      	ldr	r0, [pc, #288]	; (8000544 <fsm_automatic_run+0x228>)
+ 8000422:	f001 f8b8 	bl	8001596 <HAL_GPIO_WritePin>
                 HAL_GPIO_WritePin(GPIOA, D4_Pin, RESET);         // Bật đèn xanh
- 8000422:	2200      	movs	r2, #0
- 8000424:	2110      	movs	r1, #16
- 8000426:	4847      	ldr	r0, [pc, #284]	; (8000544 <fsm_automatic_run+0x228>)
- 8000428:	f001 f8b5 	bl	8001596 <HAL_GPIO_WritePin>
-
+ 8000426:	2200      	movs	r2, #0
+ 8000428:	2110      	movs	r1, #16
+ 800042a:	4846      	ldr	r0, [pc, #280]	; (8000544 <fsm_automatic_run+0x228>)
+ 800042c:	f001 f8b3 	bl	8001596 <HAL_GPIO_WritePin>
                 setTimerRed();
- 800042c:	f000 fc6c 	bl	8000d08 <setTimerRed>
+ 8000430:	f000 fc6a 	bl	8000d08 <setTimerRed>
                 setTimerGreen();
- 8000430:	f000 fc7c 	bl	8000d2c <setTimerGreen>
+ 8000434:	f000 fc7a 	bl	8000d2c <setTimerGreen>
                 setOneSecond();
- 8000434:	f000 fc98 	bl	8000d68 <setOneSecond>
+ 8000438:	f000 fc96 	bl	8000d68 <setOneSecond>
                 state = NorthSouth;
- 8000438:	4b3d      	ldr	r3, [pc, #244]	; (8000530 <fsm_automatic_run+0x214>)
- 800043a:	2202      	movs	r2, #2
- 800043c:	601a      	str	r2, [r3, #0]
-            }
-
+ 800043c:	4b3c      	ldr	r3, [pc, #240]	; (8000530 <fsm_automatic_run+0x214>)
+ 800043e:	2202      	movs	r2, #2
+ 8000440:	601a      	str	r2, [r3, #0]
             if (isButtonPressed(MODE_BUTTON)) {
- 800043e:	2000      	movs	r0, #0
- 8000440:	f7ff fe84 	bl	800014c <isButtonPressed>
- 8000444:	4603      	mov	r3, r0
- 8000446:	2b00      	cmp	r3, #0
- 8000448:	d06d      	beq.n	8000526 <fsm_automatic_run+0x20a>
+ 8000442:	2000      	movs	r0, #0
+ 8000444:	f7ff fe82 	bl	800014c <isButtonPressed>
+ 8000448:	4603      	mov	r3, r0
+ 800044a:	2b00      	cmp	r3, #0
+ 800044c:	d06b      	beq.n	8000526 <fsm_automatic_run+0x20a>
                 state = RED_MODE;
- 800044a:	4b39      	ldr	r3, [pc, #228]	; (8000530 <fsm_automatic_run+0x214>)
- 800044c:	2203      	movs	r2, #3
- 800044e:	601a      	str	r2, [r3, #0]
-            }
+ 800044e:	4b38      	ldr	r3, [pc, #224]	; (8000530 <fsm_automatic_run+0x214>)
+ 8000450:	2203      	movs	r2, #3
+ 8000452:	601a      	str	r2, [r3, #0]
             break;
- 8000450:	e069      	b.n	8000526 <fsm_automatic_run+0x20a>
-
-        case NorthSouth:
+ 8000454:	e067      	b.n	8000526 <fsm_automatic_run+0x20a>
             if (oneSecondFlag() == 1) {
- 8000452:	f000 fc47 	bl	8000ce4 <oneSecondFlag>
- 8000456:	4603      	mov	r3, r0
- 8000458:	2b01      	cmp	r3, #1
- 800045a:	d113      	bne.n	8000484 <fsm_automatic_run+0x168>
-                // Giảm số đếm
+ 8000456:	f000 fc45 	bl	8000ce4 <oneSecondFlag>
+ 800045a:	4603      	mov	r3, r0
+ 800045c:	2b01      	cmp	r3, #1
+ 800045e:	d113      	bne.n	8000488 <fsm_automatic_run+0x16c>
                 if (number1 > 0) number1--;
- 800045c:	4b36      	ldr	r3, [pc, #216]	; (8000538 <fsm_automatic_run+0x21c>)
- 800045e:	681b      	ldr	r3, [r3, #0]
- 8000460:	2b00      	cmp	r3, #0
- 8000462:	dd04      	ble.n	800046e <fsm_automatic_run+0x152>
- 8000464:	4b34      	ldr	r3, [pc, #208]	; (8000538 <fsm_automatic_run+0x21c>)
- 8000466:	681b      	ldr	r3, [r3, #0]
- 8000468:	3b01      	subs	r3, #1
- 800046a:	4a33      	ldr	r2, [pc, #204]	; (8000538 <fsm_automatic_run+0x21c>)
- 800046c:	6013      	str	r3, [r2, #0]
+ 8000460:	4b35      	ldr	r3, [pc, #212]	; (8000538 <fsm_automatic_run+0x21c>)
+ 8000462:	681b      	ldr	r3, [r3, #0]
+ 8000464:	2b00      	cmp	r3, #0
+ 8000466:	dd04      	ble.n	8000472 <fsm_automatic_run+0x156>
+ 8000468:	4b33      	ldr	r3, [pc, #204]	; (8000538 <fsm_automatic_run+0x21c>)
+ 800046a:	681b      	ldr	r3, [r3, #0]
+ 800046c:	3b01      	subs	r3, #1
+ 800046e:	4a32      	ldr	r2, [pc, #200]	; (8000538 <fsm_automatic_run+0x21c>)
+ 8000470:	6013      	str	r3, [r2, #0]
                 if (number2 > 0) number2--;
- 800046e:	4b34      	ldr	r3, [pc, #208]	; (8000540 <fsm_automatic_run+0x224>)
- 8000470:	681b      	ldr	r3, [r3, #0]
- 8000472:	2b00      	cmp	r3, #0
- 8000474:	dd04      	ble.n	8000480 <fsm_automatic_run+0x164>
- 8000476:	4b32      	ldr	r3, [pc, #200]	; (8000540 <fsm_automatic_run+0x224>)
- 8000478:	681b      	ldr	r3, [r3, #0]
- 800047a:	3b01      	subs	r3, #1
- 800047c:	4a30      	ldr	r2, [pc, #192]	; (8000540 <fsm_automatic_run+0x224>)
- 800047e:	6013      	str	r3, [r2, #0]
+ 8000472:	4b33      	ldr	r3, [pc, #204]	; (8000540 <fsm_automatic_run+0x224>)
+ 8000474:	681b      	ldr	r3, [r3, #0]
+ 8000476:	2b00      	cmp	r3, #0
+ 8000478:	dd04      	ble.n	8000484 <fsm_automatic_run+0x168>
+ 800047a:	4b31      	ldr	r3, [pc, #196]	; (8000540 <fsm_automatic_run+0x224>)
+ 800047c:	681b      	ldr	r3, [r3, #0]
+ 800047e:	3b01      	subs	r3, #1
+ 8000480:	4a2f      	ldr	r2, [pc, #188]	; (8000540 <fsm_automatic_run+0x224>)
+ 8000482:	6013      	str	r3, [r2, #0]
                 setOneSecond();
- 8000480:	f000 fc72 	bl	8000d68 <setOneSecond>
-            }
-
+ 8000484:	f000 fc70 	bl	8000d68 <setOneSecond>
             if (greenFlag() == 1) {
- 8000484:	f000 fc0a 	bl	8000c9c <greenFlag>
- 8000488:	4603      	mov	r3, r0
- 800048a:	2b01      	cmp	r3, #1
- 800048c:	d111      	bne.n	80004b2 <fsm_automatic_run+0x196>
-                // Chuyển sang đèn vàng
+ 8000488:	f000 fc08 	bl	8000c9c <greenFlag>
+ 800048c:	4603      	mov	r3, r0
+ 800048e:	2b01      	cmp	r3, #1
+ 8000490:	d111      	bne.n	80004b6 <fsm_automatic_run+0x19a>
                 HAL_GPIO_WritePin(GPIOA, D1_Pin | D3_Pin, SET);  // Tắt đèn xanh
- 800048e:	2201      	movs	r2, #1
- 8000490:	210a      	movs	r1, #10
- 8000492:	482c      	ldr	r0, [pc, #176]	; (8000544 <fsm_automatic_run+0x228>)
- 8000494:	f001 f87f 	bl	8001596 <HAL_GPIO_WritePin>
+ 8000492:	2201      	movs	r2, #1
+ 8000494:	210a      	movs	r1, #10
+ 8000496:	482b      	ldr	r0, [pc, #172]	; (8000544 <fsm_automatic_run+0x228>)
+ 8000498:	f001 f87d 	bl	8001596 <HAL_GPIO_WritePin>
                 HAL_GPIO_WritePin(GPIOA, D2_Pin, RESET);         // Bật đèn vàng
- 8000498:	2200      	movs	r2, #0
- 800049a:	2104      	movs	r1, #4
- 800049c:	4829      	ldr	r0, [pc, #164]	; (8000544 <fsm_automatic_run+0x228>)
- 800049e:	f001 f87a 	bl	8001596 <HAL_GPIO_WritePin>
+ 800049c:	2200      	movs	r2, #0
+ 800049e:	2104      	movs	r1, #4
+ 80004a0:	4828      	ldr	r0, [pc, #160]	; (8000544 <fsm_automatic_run+0x228>)
+ 80004a2:	f001 f878 	bl	8001596 <HAL_GPIO_WritePin>
                 number1 = durForRed - durForGreen - 1;
- 80004a2:	4b24      	ldr	r3, [pc, #144]	; (8000534 <fsm_automatic_run+0x218>)
- 80004a4:	681a      	ldr	r2, [r3, #0]
- 80004a6:	4b25      	ldr	r3, [pc, #148]	; (800053c <fsm_automatic_run+0x220>)
- 80004a8:	681b      	ldr	r3, [r3, #0]
- 80004aa:	1ad3      	subs	r3, r2, r3
- 80004ac:	3b01      	subs	r3, #1
- 80004ae:	4a22      	ldr	r2, [pc, #136]	; (8000538 <fsm_automatic_run+0x21c>)
- 80004b0:	6013      	str	r3, [r2, #0]
-            }
-
+ 80004a6:	4b23      	ldr	r3, [pc, #140]	; (8000534 <fsm_automatic_run+0x218>)
+ 80004a8:	681a      	ldr	r2, [r3, #0]
+ 80004aa:	4b24      	ldr	r3, [pc, #144]	; (800053c <fsm_automatic_run+0x220>)
+ 80004ac:	681b      	ldr	r3, [r3, #0]
+ 80004ae:	1ad3      	subs	r3, r2, r3
+ 80004b0:	3b01      	subs	r3, #1
+ 80004b2:	4a21      	ldr	r2, [pc, #132]	; (8000538 <fsm_automatic_run+0x21c>)
+ 80004b4:	6013      	str	r3, [r2, #0]
             if (redFlag() == 1) {
- 80004b2:	f000 fbe1 	bl	8000c78 <redFlag>
- 80004b6:	4603      	mov	r3, r0
- 80004b8:	2b01      	cmp	r3, #1
- 80004ba:	d126      	bne.n	800050a <fsm_automatic_run+0x1ee>
-                // Chuyển lại trạng thái East-West
+ 80004b6:	f000 fbdf 	bl	8000c78 <redFlag>
+ 80004ba:	4603      	mov	r3, r0
+ 80004bc:	2b01      	cmp	r3, #1
+ 80004be:	d126      	bne.n	800050e <fsm_automatic_run+0x1f2>
                 number1 = durForRed - 1;
- 80004bc:	4b1d      	ldr	r3, [pc, #116]	; (8000534 <fsm_automatic_run+0x218>)
- 80004be:	681b      	ldr	r3, [r3, #0]
- 80004c0:	3b01      	subs	r3, #1
- 80004c2:	4a1d      	ldr	r2, [pc, #116]	; (8000538 <fsm_automatic_run+0x21c>)
- 80004c4:	6013      	str	r3, [r2, #0]
+ 80004c0:	4b1c      	ldr	r3, [pc, #112]	; (8000534 <fsm_automatic_run+0x218>)
+ 80004c2:	681b      	ldr	r3, [r3, #0]
+ 80004c4:	3b01      	subs	r3, #1
+ 80004c6:	4a1c      	ldr	r2, [pc, #112]	; (8000538 <fsm_automatic_run+0x21c>)
+ 80004c8:	6013      	str	r3, [r2, #0]
                 number2 = durForGreen - 1;
- 80004c6:	4b1d      	ldr	r3, [pc, #116]	; (800053c <fsm_automatic_run+0x220>)
- 80004c8:	681b      	ldr	r3, [r3, #0]
- 80004ca:	3b01      	subs	r3, #1
- 80004cc:	4a1c      	ldr	r2, [pc, #112]	; (8000540 <fsm_automatic_run+0x224>)
- 80004ce:	6013      	str	r3, [r2, #0]
-
+ 80004ca:	4b1c      	ldr	r3, [pc, #112]	; (800053c <fsm_automatic_run+0x220>)
+ 80004cc:	681b      	ldr	r3, [r3, #0]
+ 80004ce:	3b01      	subs	r3, #1
+ 80004d0:	4a1b      	ldr	r2, [pc, #108]	; (8000540 <fsm_automatic_run+0x224>)
+ 80004d2:	6013      	str	r3, [r2, #0]
                 HAL_GPIO_WritePin(GPIOA, D1_Pin, RESET);  // Đỏ
- 80004d0:	2200      	movs	r2, #0
- 80004d2:	2102      	movs	r1, #2
- 80004d4:	481b      	ldr	r0, [pc, #108]	; (8000544 <fsm_automatic_run+0x228>)
- 80004d6:	f001 f85e 	bl	8001596 <HAL_GPIO_WritePin>
+ 80004d4:	2200      	movs	r2, #0
+ 80004d6:	2102      	movs	r1, #2
+ 80004d8:	481a      	ldr	r0, [pc, #104]	; (8000544 <fsm_automatic_run+0x228>)
+ 80004da:	f001 f85c 	bl	8001596 <HAL_GPIO_WritePin>
                 HAL_GPIO_WritePin(GPIOA, D2_Pin | D3_Pin, SET);
- 80004da:	2201      	movs	r2, #1
- 80004dc:	210c      	movs	r1, #12
- 80004de:	4819      	ldr	r0, [pc, #100]	; (8000544 <fsm_automatic_run+0x228>)
- 80004e0:	f001 f859 	bl	8001596 <HAL_GPIO_WritePin>
+ 80004de:	2201      	movs	r2, #1
+ 80004e0:	210c      	movs	r1, #12
+ 80004e2:	4818      	ldr	r0, [pc, #96]	; (8000544 <fsm_automatic_run+0x228>)
+ 80004e4:	f001 f857 	bl	8001596 <HAL_GPIO_WritePin>
                 HAL_GPIO_WritePin(GPIOA, D4_Pin | D5_Pin, SET);
- 80004e4:	2201      	movs	r2, #1
- 80004e6:	2130      	movs	r1, #48	; 0x30
- 80004e8:	4816      	ldr	r0, [pc, #88]	; (8000544 <fsm_automatic_run+0x228>)
- 80004ea:	f001 f854 	bl	8001596 <HAL_GPIO_WritePin>
+ 80004e8:	2201      	movs	r2, #1
+ 80004ea:	2130      	movs	r1, #48	; 0x30
+ 80004ec:	4815      	ldr	r0, [pc, #84]	; (8000544 <fsm_automatic_run+0x228>)
+ 80004ee:	f001 f852 	bl	8001596 <HAL_GPIO_WritePin>
                 HAL_GPIO_WritePin(GPIOA, D6_Pin, RESET);  // Xanh
- 80004ee:	2200      	movs	r2, #0
- 80004f0:	2140      	movs	r1, #64	; 0x40
- 80004f2:	4814      	ldr	r0, [pc, #80]	; (8000544 <fsm_automatic_run+0x228>)
- 80004f4:	f001 f84f 	bl	8001596 <HAL_GPIO_WritePin>
-
+ 80004f2:	2200      	movs	r2, #0
+ 80004f4:	2140      	movs	r1, #64	; 0x40
+ 80004f6:	4813      	ldr	r0, [pc, #76]	; (8000544 <fsm_automatic_run+0x228>)
+ 80004f8:	f001 f84d 	bl	8001596 <HAL_GPIO_WritePin>
                 setTimerRed();
- 80004f8:	f000 fc06 	bl	8000d08 <setTimerRed>
+ 80004fc:	f000 fc04 	bl	8000d08 <setTimerRed>
                 setTimerGreen();
- 80004fc:	f000 fc16 	bl	8000d2c <setTimerGreen>
+ 8000500:	f000 fc14 	bl	8000d2c <setTimerGreen>
                 setOneSecond();
- 8000500:	f000 fc32 	bl	8000d68 <setOneSecond>
+ 8000504:	f000 fc30 	bl	8000d68 <setOneSecond>
                 state = EastWest;
- 8000504:	4b0a      	ldr	r3, [pc, #40]	; (8000530 <fsm_automatic_run+0x214>)
- 8000506:	2201      	movs	r2, #1
- 8000508:	601a      	str	r2, [r3, #0]
-            }
-
+ 8000508:	4b09      	ldr	r3, [pc, #36]	; (8000530 <fsm_automatic_run+0x214>)
+ 800050a:	2201      	movs	r2, #1
+ 800050c:	601a      	str	r2, [r3, #0]
             if (isButtonPressed(MODE_BUTTON)) {
- 800050a:	2000      	movs	r0, #0
- 800050c:	f7ff fe1e 	bl	800014c <isButtonPressed>
- 8000510:	4603      	mov	r3, r0
- 8000512:	2b00      	cmp	r3, #0
- 8000514:	d009      	beq.n	800052a <fsm_automatic_run+0x20e>
+ 800050e:	2000      	movs	r0, #0
+ 8000510:	f7ff fe1c 	bl	800014c <isButtonPressed>
+ 8000514:	4603      	mov	r3, r0
+ 8000516:	2b00      	cmp	r3, #0
+ 8000518:	d007      	beq.n	800052a <fsm_automatic_run+0x20e>
                 state = RED_MODE;
- 8000516:	4b06      	ldr	r3, [pc, #24]	; (8000530 <fsm_automatic_run+0x214>)
- 8000518:	2203      	movs	r2, #3
- 800051a:	601a      	str	r2, [r3, #0]
-            }
+ 800051a:	4b05      	ldr	r3, [pc, #20]	; (8000530 <fsm_automatic_run+0x214>)
+ 800051c:	2203      	movs	r2, #3
+ 800051e:	601a      	str	r2, [r3, #0]
             break;
- 800051c:	e005      	b.n	800052a <fsm_automatic_run+0x20e>
-
-
-        default:
-            // Quay lại trạng thái INIT nếu gặp lỗi
-            state = INIT;
- 800051e:	4b04      	ldr	r3, [pc, #16]	; (8000530 <fsm_automatic_run+0x214>)
- 8000520:	2200      	movs	r2, #0
- 8000522:	601a      	str	r2, [r3, #0]
+ 8000520:	e003      	b.n	800052a <fsm_automatic_run+0x20e>
             break;
+ 8000522:	bf00      	nop
  8000524:	e002      	b.n	800052c <fsm_automatic_run+0x210>
             break;
  8000526:	bf00      	nop
@@ -1390,13 +1355,13 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  durForRed = 4;
+  durForRed = 5;
  8000a5e:	4b0a      	ldr	r3, [pc, #40]	; (8000a88 <main+0x44>)
- 8000a60:	2204      	movs	r2, #4
+ 8000a60:	2205      	movs	r2, #5
  8000a62:	601a      	str	r2, [r3, #0]
-  	durForGreen = 2;
+  	durForGreen = 3;
  8000a64:	4b09      	ldr	r3, [pc, #36]	; (8000a8c <main+0x48>)
- 8000a66:	2202      	movs	r2, #2
+ 8000a66:	2203      	movs	r2, #3
  8000a68:	601a      	str	r2, [r3, #0]
   	while (1) {
   		fsm_automatic_run();

@@ -95,8 +95,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  durForRed = 4;
-  	durForGreen = 2;
+  durForRed = 5;
+  	durForGreen = 3;
   	while (1) {
   		fsm_automatic_run();
   		fsm_manual_run();
